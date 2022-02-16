@@ -20,6 +20,6 @@ public:
 
 	static void AddDisenchantSkill(RE::PlayerCharacter *player, RE::ActorValue actorVal, float fAmount)
 	{
-		player->AddSkillExperience(actorVal,Settings::fDisenchantingExpMult);
+		player->AddSkillExperience(actorVal, fAmount * Settings::fDisenchantingExpMult);
 	}
 };
