@@ -8,6 +8,8 @@ public:
 
 	inline static void LoadSettings()
 	{
+		logger::info("Loading settings");
+
 		CSimpleIniA ini;
 		ini.SetUnicode();
 		ini.LoadFile(R"(.\Data\SKSE\Plugins\Thaumaturgy.ini)");
