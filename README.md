@@ -1,4 +1,9 @@
-This is a basic plugin template for use with CommonLibSSE
+This is a simple utility plugin for use with Thaumaturgy - An Enchanting Overhaul: https://www.nexusmods.com/skyrimspecialedition/mods/57138  
+
+## What does it do?  
+
+**Current functionality includes:**  
+`Apply set mult to disenchanting XP` - Can be adjusted in the ini
 
 ## Requirements
 * [CMake](https://cmake.org/)
@@ -16,7 +21,7 @@ This is a basic plugin template for use with CommonLibSSE
 
 ## Building
 ```
-git clone https://github.com/Ryan-rsm-McKenzie/ExamplePlugin-CommonLibSSE
+git clone https://github.com/colinswrath/Thaumaturgy.git
 cd ExamplePlugin-CommonLibSSE
 git submodule update --init --recursive
 cmake -B build -S .
