@@ -4,22 +4,51 @@
 class ExperienceAdjustment
 {
 public:
-	static bool InstallDisenchantHook()
+
+	static void AddDisenchantSkill(RE::PlayerCharacter* player, RE::ActorValue actorVal, float fAmount, RE::InventoryEntryData* item)
+	{
+		if (item && (item->object->GetFormType() == RE::FormType::Weapon))
+		{
+			player->AddSkillExperience(actorVal, fAmount * Settings::fDisenchantingExpMult);
+		}
+		else
+		{
+			player->AddSkillExperience(actorVal, fAmount);
+		}
+	}
+
+	static bool InstallXbyakHook()
 	{
 		REL::Relocation<std::uintptr_t> funcBase_Hook(REL::ID(50459));		//1.5
-		std::uint8_t noopPatch[] = { 0x90 };
+
+		struct ExpPatch : Xbyak::CodeGenerator
+		{
+			ExpPatch(std::uintptr_t xpFuncAddress, std::uintptr_t returnAddress)
+			{
+				Xbyak::Label xpFuncLabel;
+				Xbyak::Label returnLabel;
+
+				mov(r9,r14);
+				sub(rsp, 0x20);
+				call(ptr[rip+ xpFuncLabel]);
+				add(rsp, 0x20);
+
+				jmp(ptr[rip + returnLabel]);
+
+				L(xpFuncLabel);
+				dq(xpFuncAddress);
+
+				L(returnLabel);
+				dq(returnAddress);
+			}
+		};
+
+		ExpPatch code(reinterpret_cast<std::uintptr_t>(AddDisenchantSkill), funcBase_Hook.address() + 0xC0);
 
 		auto& trampoline = SKSE::GetTrampoline();
-		trampoline.write_call<5>(funcBase_Hook.address() + 0xBA, AddDisenchantSkill);
-		REL::safe_write(funcBase_Hook.address() + 0xBA + 0x5, noopPatch, 1);
-
-		logger::info("InstallDisenchantHook loaded");
-
+		trampoline.write_branch<6>(funcBase_Hook.address() + 0xBA, trampoline.allocate(code));
+		logger::info("Disenchant hook installed");
 		return true;
 	}
 
-	static void AddDisenchantSkill(RE::PlayerCharacter *player, RE::ActorValue actorVal, float fAmount)
-	{
-		player->AddSkillExperience(actorVal, fAmount * Settings::fDisenchantingExpMult);
-	}
 };

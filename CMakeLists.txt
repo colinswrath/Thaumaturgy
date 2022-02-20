@@ -61,6 +61,7 @@ endif()
 
 if (MSVC)
 	add_compile_definitions(
+		SKSE_SUPPORT_XBYAK
 		_UNICODE
 	)
 
