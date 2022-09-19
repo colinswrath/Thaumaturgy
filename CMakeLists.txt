@@ -32,7 +32,7 @@ set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>" CACHE STR
 
 project(
 	Thaumaturgy
-	VERSION 1.0.0
+	VERSION 1.0.1
 	LANGUAGES CXX
 )
 
@@ -80,9 +80,11 @@ set(Boost_USE_STATIC_LIBS ON)
 
 # ---- Dependencies ----
 
-add_subdirectory("extern/CommonLibSSE" CommonLibSSE)
+#add_subdirectory("extern/CommonLibSSE" CommonLibSSE)
 
+find_package(CommonLibSSE REQUIRED)
 find_package(spdlog REQUIRED CONFIG)
+find_package(xbyak CONFIG REQUIRED)
 
 # ---- Add source files ----
 
@@ -134,9 +136,11 @@ target_include_directories(
 
 target_link_libraries(
 	${PROJECT_NAME}
-	PRIVATE
+	PUBLIC
 		CommonLibSSE::CommonLibSSE
 		spdlog::spdlog
+		fmt::fmt
+		xbyak::xbyak
 )
 
 if (MSVC)
@@ -178,7 +182,7 @@ if (MSVC)
 			/WX	# Warning level (warnings are errors)
 
 			"$<$<CONFIG:DEBUG>:>"
-			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob3>"
+			"$<$<CONFIG:RELEASE>:/Zc:inline;/JMC-;/Ob3;/O2;/DNDEBUG;/Gy;/Zi>"
 	)
 
 	target_link_options(

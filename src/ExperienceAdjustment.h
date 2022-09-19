@@ -1,11 +1,37 @@
 #pragma once
 #include "Settings.h"
+#include <xbyak/xbyak.h>
 
-class ExperienceAdjustment
+namespace ExperienceAdjustment
 {
-public:
+	bool InstallXbyakHook();
+	void AddDisenchantSkill(RE::PlayerCharacter* player, RE::ActorValue actorVal, float fAmount, RE::InventoryEntryData* item);
 
-	static void AddDisenchantSkill(RE::PlayerCharacter* player, RE::ActorValue actorVal, float fAmount, RE::InventoryEntryData* item)
+	REL::Relocation<std::uintptr_t> funcBase_Hook{ REL::RelocationID(50459, 51363) };
+
+	struct ExpPatch : Xbyak::CodeGenerator
+	{
+		ExpPatch()
+		{
+			Xbyak::Label xpFuncLabel;
+			Xbyak::Label returnLabel;
+
+			mov(r9, r14);
+			sub(rsp, 0x20);
+			call(ptr[rip + xpFuncLabel]);
+			add(rsp, 0x20);
+
+			jmp(ptr[rip + returnLabel]);
+
+			L(xpFuncLabel);
+			dq(reinterpret_cast<std::uintptr_t>(ExperienceAdjustment::AddDisenchantSkill));
+
+			L(returnLabel);
+			dq(ExperienceAdjustment::funcBase_Hook.address() + 0xC0);
+		}
+	};
+
+	void AddDisenchantSkill(RE::PlayerCharacter* player, RE::ActorValue actorVal, float fAmount, RE::InventoryEntryData* item)
 	{
 		if (item && (item->object->GetFormType() == RE::FormType::Weapon))
 		{
@@ -17,33 +43,10 @@ public:
 		}
 	}
 
-	static bool InstallXbyakHook()
+	bool InstallXbyakHook()
 	{
-		REL::Relocation<std::uintptr_t> funcBase_Hook(REL::ID(50459));		//1.5
-
-		struct ExpPatch : Xbyak::CodeGenerator
-		{
-			ExpPatch(std::uintptr_t xpFuncAddress, std::uintptr_t returnAddress)
-			{
-				Xbyak::Label xpFuncLabel;
-				Xbyak::Label returnLabel;
-
-				mov(r9,r14);
-				sub(rsp, 0x20);
-				call(ptr[rip+ xpFuncLabel]);
-				add(rsp, 0x20);
-
-				jmp(ptr[rip + returnLabel]);
-
-				L(xpFuncLabel);
-				dq(xpFuncAddress);
-
-				L(returnLabel);
-				dq(returnAddress);
-			}
-		};
-
-		ExpPatch code(reinterpret_cast<std::uintptr_t>(AddDisenchantSkill), funcBase_Hook.address() + 0xC0);
+		ExperienceAdjustment::ExpPatch code;
+		code.ready();
 
 		auto& trampoline = SKSE::GetTrampoline();
 		trampoline.write_branch<6>(funcBase_Hook.address() + 0xBA, trampoline.allocate(code));

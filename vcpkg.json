@@ -1,15 +1,15 @@
 {
   "name": "thaumaturgy",
   "version-string": "1.0.0",
-  "description": "",
+  "description": "Plugin created to adjust enchantment XP",
   "homepage": "https://github.com/colinswrath/Thaumaturgy.git",
   "license": "MIT",
   "dependencies": [
-    "boost-atomic",
     "boost-stl-interfaces",
-    "span-lite",
+    "rsm-binary-io",
     "spdlog",
-	  "simpleini",
-    "xbyak"
+	"simpleini",
+    "xbyak",
+	"commonlibsse-ng-flatrim"
   ]
 }
