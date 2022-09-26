@@ -138,8 +138,6 @@ target_link_libraries(
 	${PROJECT_NAME}
 	PUBLIC
 		CommonLibSSE::CommonLibSSE
-		spdlog::spdlog
-		fmt::fmt
 		xbyak::xbyak
 )
 
