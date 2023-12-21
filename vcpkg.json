@@ -10,6 +10,6 @@
     "spdlog",
 	"simpleini",
     "xbyak",
-	"commonlibsse-ng-flatrim"
+	"commonlibsse-ng"
   ]
 }
