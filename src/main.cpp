@@ -74,10 +74,10 @@ extern "C" DLLEXPORT bool SKSEAPI SKSEPlugin_Load(const SKSE::LoadInterface* a_s
 	logger::info("loading Thaumaturgy disenchant");
 
 	SKSE::Init(a_skse);
-	SKSE::AllocTrampoline(64);
+	SKSE::AllocTrampoline(128);
 	Settings::LoadSettings();
 	
-	if (!ExperienceAdjustment::InstallXbyakHook())
+	if (!ExperienceAdjustment::InstallDisenchantHook() || !ExperienceAdjustment::InstallEnchantHook())
 	{
 		logger::error("Hooks not loaded.");
 		return false;
